@@ -46,6 +46,25 @@ function main() {
 
   upgradeAndInstallPackages
   installVirtualBoxGuestAdditions
+
+  greenEcho "===> Add the vagrant user to the vboxsf group"
+  sudo usermod -aG vboxsf vagrant
+  addVagrantSSHKey "vagrant"
+}
+
+# Add the local machine public SSH Key for the new user account
+# Arguments:
+#   Account Username
+#   Public SSH Key
+function addVagrantSSHKey() {
+  yellowEcho "===> Adding public ssh key"
+  local username=${1}
+  mkdir -p ~/.ssh
+  chmod 700 ~/.ssh
+  wget --no-check-certificate \
+    https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub \
+    -O ~/.ssh/authorized_keys
+  chmod 600 ~/.ssh/authorized_keys
 }
 
 # Disables the sudo password prompt for a user account by editing /etc/sudoers
@@ -62,3 +81,5 @@ function revertSudoers() {
   sudo cp /etc/sudoers.bak /etc/sudoers
   sudo rm -rf /etc/sudoers.bak
 }
+
+main
