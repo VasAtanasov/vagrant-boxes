@@ -5,8 +5,7 @@ function installVirtualBoxGuestAdditions() {
 
   local FOLDER=/media/cdrom
 
-  if [[ -d "FOLDER" ]]
-  then
+  if [[ -d "FOLDER" ]]; then
     echo "$FOLDER exists on your filesystem."
   else
     sudo mkdir -p ${FOLDER}
@@ -15,7 +14,7 @@ function installVirtualBoxGuestAdditions() {
   if [[ $(findmnt -M "$FOLDER") ]]; then
     echo "Mounted"
   else
-      sudo mount /dev/sr0 ${FOLDER}
+    sudo mount /dev/sr0 ${FOLDER}
   fi
 
   sudo ${FOLDER}/VBoxLinuxAdditions.run
@@ -23,9 +22,16 @@ function installVirtualBoxGuestAdditions() {
 
 function main() {
   local username="vagrant"
+  local vbGroup="vboxsf"
 
   installVirtualBoxGuestAdditions
-  echo "===> Adding ${username} user to the vboxsf group"
-  sudo usermod -aG vboxsf ${username}
+  echo "===> Adding ${username} user to the ${vbGroup} group"
 
+  if grep -q $vbGroup /etc/group; then
+    sudo usermod -aG ${vbGroup} ${username}
+  else
+    echo "Group ${vbGroup} does not exist"
+  fi
 }
+
+main

@@ -1,27 +1,5 @@
 #!/bin/bash
 
-red="\033[0;31m"
-green="\033[0;32m"
-yellow="\033[0;33m"
-blue="\033[0;34m"
-NC="\033[0m" # No Color
-
-redEcho() {
-  echo -e "${red}$1${NC}"
-}
-
-greenEcho() {
-  echo -e "${green}$1${NC}"
-}
-
-yellowEcho() {
-  echo -e "${yellow}$1${NC}"
-}
-
-blueEcho() {
-  echo -e "${blue}$1${NC}"
-}
-
 function getCurrentDir() {
   local current_dir="${BASH_SOURCE%/*}"
   if [[ ! -d "${current_dir}" ]]; then current_dir="$PWD"; fi
@@ -30,6 +8,7 @@ function getCurrentDir() {
 
 function includeDependencies() {
   source "${current_dir}/functions.sh"
+  source "${current_dir}/echolib.sh"
 }
 
 current_dir=$(getCurrentDir)
@@ -38,10 +17,15 @@ includeDependencies
 function upgradeAndInstallPackages() {
   yellowEcho "===> Upgrading and installing packages"
   sudo apt-get update -y
-  #  sudo apt-get upgrade -y
+  sudo apt-get upgrade -y
   sudo apt-get install -y build-essential dkms linux-headers-"$(uname -r)" gcc make tar bzip2 wget curl git
 }
 
+function cleanUpCache() {
+  sudo apt-get autoremove
+  sudo rm -rf ~/.cache/thumbnails/*
+  sudo apt-get clean
+}
 
 function main() {
   yellowEcho '===> Running setup.sh script...'
@@ -77,12 +61,6 @@ function main() {
   zero
 
   setupUfw
-}
-
-function cleanUpCache() {
-  sudo apt-get autoremove
-  sudo rm -rf ~/.cache/thumbnails/*
-  sudo apt-get clean
 }
 
 function zero() {
