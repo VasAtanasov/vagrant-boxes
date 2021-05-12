@@ -42,11 +42,6 @@ function upgradeAndInstallPackages() {
   sudo apt-get install -y build-essential dkms linux-headers-"$(uname -r)" gcc make tar bzip2 wget curl git
 }
 
-function installVirtualBoxGuestAdditions() {
-  yellowEcho "===> Installing VirtualBox Guest Additions"
-  sudo mount /dev/sr0 /mnt
-  sudo /mnt/VBoxLinuxAdditions.run
-}
 
 function main() {
   yellowEcho '===> Running setup.sh script...'
@@ -70,9 +65,6 @@ function main() {
 
   upgradeAndInstallPackages
 
-  #  installVirtualBoxGuestAdditions
-  #  greenEcho "===> Add the ${username} user to the vboxsf group"
-  #  sudo usermod -aG vboxsf ${username}
   greenEcho "===> Adding vagrant public key to ~/.ssh/authorized_keys"
   wget --no-check-certificate -q https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub
   addSSHKey ${username} "$(cat vagrant.pub)"
@@ -85,17 +77,6 @@ function main() {
   zero
 
   setupUfw
-}
-
-function disableSudoPassword() {
-  local username="${1}"
-  sudo cp /etc/sudoers /etc/sudoers.bak
-  sudo bash -c "echo '${username} ALL=(ALL) NOPASSWD: ALL' | (EDITOR='tee -a' visudo)"
-}
-
-function revertSudoers() {
-  sudo cp /etc/sudoers.bak /etc/sudoers
-  sudo rm -rf /etc/sudoers.bak
 }
 
 function cleanUpCache() {
