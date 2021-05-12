@@ -49,6 +49,12 @@ function main() {
   greenEcho "===> Add the vagrant user to the vboxsf group"
   sudo usermod -aG vboxsf vagrant
   addVagrantSSHKey "vagrant"
+
+  greenEcho "===> Cleaning up apt-get cache"
+  cleanUp
+
+  sudo dd if=/dev/zero of=/EMPTY bs=1M status=progress
+  sudo rm -f /EMPTY
 }
 
 function addVagrantSSHKey() {
