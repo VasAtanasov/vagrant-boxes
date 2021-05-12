@@ -44,7 +44,6 @@ function main() {
   disableSudoPassword "vagrant"
 
   upgradeAndInstallPackages
-  sh -c "installVirtualBoxGuestAdditions"
 
   greenEcho "===> Add the vagrant user to the vboxsf group"
   sudo usermod -aG vboxsf vagrant
@@ -91,3 +90,4 @@ function cleanUp() {
 }
 
 main
+installVirtualBoxGuestAdditions
