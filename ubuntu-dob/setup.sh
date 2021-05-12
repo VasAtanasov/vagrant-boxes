@@ -22,11 +22,24 @@ blueEcho() {
   echo -e "${blue}$1${NC}"
 }
 
+function getCurrentDir() {
+  local current_dir="${BASH_SOURCE%/*}"
+  if [[ ! -d "${current_dir}" ]]; then current_dir="$PWD"; fi
+  echo "${current_dir}"
+}
+
+function includeDependencies() {
+  source "${current_dir}/functions.sh"
+}
+
+current_dir=$(getCurrentDir)
+includeDependencies
+
 function upgradeAndInstallPackages() {
   yellowEcho "===> Upgrading and installing packages"
   sudo apt-get update -y
-  sudo apt-get upgrade -y
-  sudo apt-get install -y build-essential dkms linux-headers-$(uname -r) gcc make tar bzip2 wget curl git
+  #  sudo apt-get upgrade -y
+  sudo apt-get install -y build-essential dkms linux-headers-"$(uname -r)" gcc make tar bzip2 wget curl git
 }
 
 function installVirtualBoxGuestAdditions() {
@@ -38,33 +51,40 @@ function installVirtualBoxGuestAdditions() {
 function main() {
   yellowEcho '===> Running setup.sh script...'
 
-  greenEcho "===> Add the vagrant user to the sudoers list and allow it to sudo without entering password"
-  disableSudoPassword "vagrant"
+  greenEcho "===> Checking if vagrant user exists"
+  local username="vagrant"
+  local password="vagrant"
+
+  local exists
+  exists=$(grep -c "^${username}:" /etc/passwd)
+  if [ "$exists" -eq 0 ]; then
+    redEcho "===> User ${username} does not exist"
+    greenEcho "===> Attempting to create ${username} user"
+    addUserAccount ${username} ${password}
+  else
+    greenEcho "===> User ${username} already exists ..."
+  fi
+
+  greenEcho "===> Add ${username} user to the sudoers list and allow it to sudo without entering password"
+  disableSudoPassword ${username}
 
   upgradeAndInstallPackages
-  installVirtualBoxGuestAdditions
 
-  greenEcho "===> Add the vagrant user to the vboxsf group"
-  sudo usermod -aG vboxsf vagrant
+  #  installVirtualBoxGuestAdditions
+  #  greenEcho "===> Add the ${username} user to the vboxsf group"
+  #  sudo usermod -aG vboxsf ${username}
+  greenEcho "===> Adding vagrant public key to ~/.ssh/authorized_keys"
+  wget --no-check-certificate -q https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub
+  addSSHKey ${username} "$(cat vagrant.pub)"
+  rm vagrant.pub
 
-  addVagrantSSHKey "vagrant"
+  greenEcho "===> Cleaning cache"
+  cleanUpCache
 
-  greenEcho "===> Cleaning up apt-get cache"
-  cleanUp
+  greenEcho "===> Optimizing space"
+  zero
 
-  sudo dd if=/dev/zero of=/EMPTY bs=1M status=progress
-  sudo rm -rf /EMPTY
-}
-
-function addVagrantSSHKey() {
-  yellowEcho "===> Adding public ssh key"
-  local username=${1}
-  mkdir -p ~/.ssh
-  chmod 700 ~/.ssh
-  wget --no-check-certificate -q \
-    https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub \
-    -O ~/.ssh/authorized_keys
-  chmod 600 ~/.ssh/authorized_keys
+  setupUfw
 }
 
 function disableSudoPassword() {
@@ -78,15 +98,15 @@ function revertSudoers() {
   sudo rm -rf /etc/sudoers.bak
 }
 
-function setupUfw() {
-  sudo ufw allow OpenSSH
-  yes y | sudo ufw enable
-}
-
-function cleanUp() {
+function cleanUpCache() {
   sudo apt-get autoremove
   sudo rm -rf ~/.cache/thumbnails/*
   sudo apt-get clean
+}
+
+function zero() {
+  sudo dd if=/dev/zero of=/EMPTY bs=1M status=progress
+  sudo rm -rf /EMPTY
 }
 
 main
