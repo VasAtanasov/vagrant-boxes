@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 red="\033[0;31m"
 green="\033[0;32m"
 yellow="\033[0;33m"
@@ -44,16 +42,18 @@ function main() {
   disableSudoPassword "vagrant"
 
   upgradeAndInstallPackages
+  installVirtualBoxGuestAdditions
 
   greenEcho "===> Add the vagrant user to the vboxsf group"
   sudo usermod -aG vboxsf vagrant
+
   addVagrantSSHKey "vagrant"
 
   greenEcho "===> Cleaning up apt-get cache"
   cleanUp
 
   sudo dd if=/dev/zero of=/EMPTY bs=1M status=progress
-  sudo rm -f /EMPTY
+  sudo rm -rf /EMPTY
 }
 
 function addVagrantSSHKey() {
@@ -61,7 +61,7 @@ function addVagrantSSHKey() {
   local username=${1}
   mkdir -p ~/.ssh
   chmod 700 ~/.ssh
-  wget --no-check-certificate \
+  wget --no-check-certificate -q \
     https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub \
     -O ~/.ssh/authorized_keys
   chmod 600 ~/.ssh/authorized_keys
@@ -90,4 +90,3 @@ function cleanUp() {
 }
 
 main
-installVirtualBoxGuestAdditions
