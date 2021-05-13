@@ -40,16 +40,16 @@ function main() {
   disableSudoPassword ${username}
 
   greenEcho "===> Adding vagrant public key to ~/.ssh/authorized_keys"
-  source "${current_dir}/vagrant.sh"
+  sudo bash "${current_dir}/vagrant.sh"
 
   greenEcho "===> Installing VirtualBox Guest Additions"
-  source "${current_dir}/virtualbox.sh"
+  sudo bash "${current_dir}/virtualbox.sh"
 
   greenEcho "===> Cleaning up"
-  source "${current_dir}/cleanup.sh"
+  sudo bash "${current_dir}/cleanup.sh"
 
   greenEcho "===> Optimizing space"
-  source "${current_dir}/minimize.sh"
+  sudo bash "${current_dir}/minimize.sh"
 
   greenEcho "===> Setting up firewall"
   setupUfw
