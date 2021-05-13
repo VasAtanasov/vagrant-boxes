@@ -53,8 +53,6 @@ function main() {
 
   greenEcho "===> Setting up firewall"
   setupUfw
-
-  reboot
 }
 
 main

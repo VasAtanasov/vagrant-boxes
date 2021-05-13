@@ -91,10 +91,6 @@ rm -rf /tmp/* /var/tmp/*
 echo "force a new random seed to be generated"
 rm -f /var/lib/systemd/random-seed
 
-echo "clear the history so our install isn't there"
-rm -f /root/.wget-hsts
-export HISTSIZE=0
-
 sync
 
 echo "==> Disk usage before cleanup"
@@ -102,3 +98,7 @@ echo "${DISK_USAGE_BEFORE_CLEANUP}"
 
 echo "==> Disk usage after cleanup"
 df -h
+
+echo "clear the history so our install isn't there"
+rm -f /root/.wget-hsts
+export HISTSIZE=0
