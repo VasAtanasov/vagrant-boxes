@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -eux
 
 function getCurrentDir() {
   local current_dir="${BASH_SOURCE%/*}"
@@ -11,21 +11,11 @@ function includeDependencies() {
   source "${current_dir}/echolib.sh"
 }
 
+export HOME_DIR=/home/vagrant
+export DEBIAN_FRONTEND=noninteractive
+
 current_dir=$(getCurrentDir)
 includeDependencies
-
-function upgradeAndInstallPackages() {
-  yellowEcho "===> Upgrading and installing packages"
-  sudo apt-get update -y
-  sudo apt-get upgrade -y
-  sudo apt-get install -y build-essential dkms linux-headers-"$(uname -r)" gcc make tar bzip2 wget curl git
-}
-
-function cleanUpCache() {
-  sudo apt-get autoremove
-  sudo rm -rf ~/.cache/thumbnails/*
-  sudo apt-get clean
-}
 
 function main() {
   yellowEcho '===> Running setup.sh script...'
@@ -44,28 +34,25 @@ function main() {
     greenEcho "===> User ${username} already exists ..."
   fi
 
+  update
+
   greenEcho "===> Add ${username} user to the sudoers list and allow it to sudo without entering password"
   disableSudoPassword ${username}
 
-  upgradeAndInstallPackages
-
   greenEcho "===> Adding vagrant public key to ~/.ssh/authorized_keys"
-  wget --no-check-certificate -q https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub
-  addSSHKey ${username} "$(cat vagrant.pub)"
-  rm vagrant.pub
+  source "${current_dir}/vagrant.sh"
 
-  greenEcho "===> Cleaning cache"
-  cleanUpCache
+  greenEcho "===> Installing VirtualBox Guest Additions"
+  source "${current_dir}/virtualbox.sh"
+
+  greenEcho "===> Cleaning up"
+  source "${current_dir}/cleanup.sh"
 
   greenEcho "===> Optimizing space"
-  zero
+  source "${current_dir}/minimize.sh"
 
+  greenEcho "===> Setting up firewall"
   setupUfw
-}
-
-function zero() {
-  sudo dd if=/dev/zero of=/EMPTY bs=1M status=progress
-  sudo rm -rf /EMPTY
 }
 
 main

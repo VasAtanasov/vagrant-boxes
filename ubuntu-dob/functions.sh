@@ -1,5 +1,14 @@
 #!/bin/bash
 
+#
+function update() {
+  yellowEcho "===> Update and upgrade all the things"
+  greenEcho "Update the package list"
+  sudo apt-get update -y
+  greenEcho "Upgrade all installed packages"
+  sudo apt-get -y dist-upgrade -o Dpkg::Options::="--force-confnew"
+}
+
 # Add the new user account
 # Arguments:
 #   Account Username
@@ -18,30 +27,6 @@ function addUserAccount() {
 
   echo "${username}:${password}" | sudo chpasswd
   sudo usermod -aG sudo "${username}"
-}
-
-# Add the local machine public SSH Key for the new user account
-# Arguments:
-#   Account Username
-#   Public SSH Key
-function addSSHKey() {
-  local username=${1}
-  local sshKey=${2}
-
-  execAsUser "${username}" "mkdir -p ~/.ssh; chmod 700 ~/.ssh; touch ~/.ssh/authorized_keys"
-  execAsUser "${username}" "echo \"${sshKey}\" | sudo tee -a ~/.ssh/authorized_keys"
-  execAsUser "${username}" "chmod 600 ~/.ssh/authorized_keys"
-}
-
-# Execute a command as a certain user
-# Arguments:
-#   Account Username
-#   Command to be executed
-function execAsUser() {
-  local username=${1}
-  local exec_command=${2}
-
-  sudo -u "${username}" -H bash -c "${exec_command}"
 }
 
 # Setup the Uncomplicated Firewall
