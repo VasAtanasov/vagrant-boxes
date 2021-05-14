@@ -14,24 +14,24 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ubuntu.vm.hostname = "ubuntu.test"
     ubuntu.vm.synced_folder ".", "/vagrant", disabled: true
 
-    ubuntu.vm.provision :shell do |shell|
-      shell.path = "docker.sh"
-    end
+    # ubuntu.vm.provision :shell do |shell|
+    #   shell.path = "https://raw.githubusercontent.com/VasAtanasov/scripts/main/docker.sh"
+    # end
+
+    # ubuntu.vm.provision :shell do |shell|
+    #   shell.env = { 'CURRENT_USER' => 'vagrant'}
+    #   shell.path = "https://raw.githubusercontent.com/VasAtanasov/scripts/main/docker-group.sh"
+    # end
 
     ubuntu.vm.provision :shell do |shell|
-      shell.env = { 'CURRENT_USER' => 'vagrant'}
-      shell.path = "docker-group.sh"
+      shell.env = { 'JAVA_VERSION' => settings['JAVA_VERSION'], 
+                    'MAVEN_VERSION' => settings['MAVEN_VERSION'] }
+      shell.path = "sdkman-java-mvn.sh"
+      shell.privileged = false
     end
 
     # ubuntu.vm.provision :shell do |shell|
     #   shell.path = "ufw-setup.sh"
-    # end
-    
-    # ubuntu.vm.provision :shell do |shell|
-    #   shell.env = { 'JAVA_VERSION' => settings['JAVA_VERSION'], 
-    #                 'MAVEN_VERSION' => settings['MAVEN_VERSION'] }
-    #   shell.path = "sdkman-java-mvn.sh"
-    #   shell.privileged = false
     # end
 
     ubuntu.vm.provider :virtualbox do |vb|

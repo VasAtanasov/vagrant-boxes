@@ -25,8 +25,6 @@ else
   echo "There is no docker installed"
 fi
 
-DOCKER_COMPOSE_VERSION=1.29.1
-
 install_bash_completion() {
   update_packages
   echo "Installing bash completion"
@@ -50,6 +48,8 @@ echo \
 
 echo "Installing Docker Engine"
 
+DOCKER_COMPOSE_VERSION=${DOCKER_COMPOSE_VERSION:-1.29.1}
+
 update_packages
 
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io >/dev/null
@@ -64,5 +64,5 @@ install_bash_completion
 echo "Install command completion for Docker Compose"
 
 sudo curl \
--sL "https://raw.githubusercontent.com/docker/compose/${DOCKER_COMPOSE_VERSION}/contrib/completion/bash/docker-compose" \
--o /etc/bash_completion.d/docker-compose
+  -sL "https://raw.githubusercontent.com/docker/compose/${DOCKER_COMPOSE_VERSION}/contrib/completion/bash/docker-compose" \
+  -o /etc/bash_completion.d/docker-compose

@@ -8,24 +8,32 @@ MAVEN_VERSION=${MAVEN_VERSION:-"3.6.3"}
 echo "Java candidate: ${JAVA_VERSION}"
 echo "Maven candidate: ${MAVEN_VERSION}"
 
-sudo apt-get update &&
-  sudo apt-get install -y zip unzip curl &&
+echo "Updateing the apt package index and installing packages needed by sdkman"
+sudo apt-get update -qq >/dev/null &&
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq zip unzip curl >/dev/null &&
   sudo rm -rf /var/lib/apt/lists/* &&
   sudo rm -rf /tmp/*
 
 USERNAME=${USERNAME:-vagrant}
 
-curl -s "https://get.sdkman.io" | bash
+echo "Installing sdkman for user ${USERNAME}"
+curl -s "https://get.sdkman.io" | bash 
 
 USER_HOME="/home/${USERNAME}"
 
-source "$USER_HOME/.sdkman/bin/sdkman-init.sh" &&
-  echo "Installing java version: ${JAVA_VERSION}" &&
-  yes | sdk install java "$JAVA_VERSION" &&
-  echo "Installing maven version: ${MAVEN_VERSION}" &&
-  yes | sdk install maven "$MAVEN_VERSION" &&
-  rm -rf "$USER_HOME/.sdkman/archives/*" &&
-  rm -rf "$USER_HOME/.sdkman/tmp/*"
+source "$USER_HOME/.sdkman/bin/sdkman-init.sh"
+
+echo "Installing java version: ${JAVA_VERSION}"
+yes | sdk install java "$JAVA_VERSION"
+
+echo "Installing maven version: ${MAVEN_VERSION}"
+yes | sdk install maven "$MAVEN_VERSION"
+
+echo "Cleaning up"
+rm -rf "$USER_HOME/.sdkman/archives/*"
+rm -rf "$USER_HOME/.sdkman/tmp/*"
+
+echo "Adding maven env"
 
 INSTALL_DIR="$USER_HOME/.sdkman/candidates"
 MAVEN_INSTALL_DIR="${INSTALL_DIR}/maven/current"
