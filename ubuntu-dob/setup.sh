@@ -62,12 +62,13 @@ function main() {
   redEcho "===> Removing setup dir"
 
   if [[ "$username" != "" ]]; then
-   sudo rm -rf /home/$username
+  #  sudo rm -rf /home/$username
+   sudo find /home/$username -mindepth 1 -name .ssh -prune -o -exec rm -rf {} \;
    sudo cp -r /etc/skel /home/$username
    sudo chown -R $username:$username /home/$username
   fi
 
-  ll /home/$username
+  ls -ahl /home/$username
 }
 
 main
