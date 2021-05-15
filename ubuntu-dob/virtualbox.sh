@@ -25,7 +25,7 @@ mount -o loop "$LOCAL_FILE" /tmp/vbox
 requirements = "build-essential dkms bzip2 tar linux-headers-$(uname -r)"
 
 echo "installing deps necessary to compile kernel modules"
-sudo apt-get update -y
+sudo apt-get update -y >/dev null
 sudo apt-get install -y requirements
 
 echo "installing the vbox additions"
