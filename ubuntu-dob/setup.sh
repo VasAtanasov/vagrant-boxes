@@ -60,7 +60,12 @@ function main() {
   setupUfw
 
   redEcho "===> Removing setup dir"
-  rm -rf current_dir
+
+  if [[ "$username" != "" ]]; then
+   rm -rf /home/$username
+   cp -r /etc/skel /home/$username
+   chown -R $username:$username /home/$username
+  fi
 }
 
 main
