@@ -22,7 +22,9 @@ fi
 mkdir -p /tmp/vbox
 mount -o loop "$LOCAL_FILE" /tmp/vbox
 
-requirements = "build-essential dkms bzip2 tar linux-headers-$(uname -r)"
+requirements = "build-essential dkms bzip2 tar the gcc make perl g++ libc6-dev linux-headers-$(uname -r)"
+
+echo "requirements: $requirements"
 
 echo "installing deps necessary to compile kernel modules"
 sudo apt-get update -y >/dev null

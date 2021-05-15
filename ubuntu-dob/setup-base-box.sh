@@ -77,6 +77,8 @@ main() {
   fi
 
   ls -ahl $HOME_DIR
+
+  sudo cleanup
 }
 
 main
