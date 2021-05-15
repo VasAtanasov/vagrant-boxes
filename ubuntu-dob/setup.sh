@@ -62,10 +62,12 @@ function main() {
   redEcho "===> Removing setup dir"
 
   if [[ "$username" != "" ]]; then
-   rm -rf /home/$username
-   cp -r /etc/skel /home/$username
-   chown -R $username:$username /home/$username
+   sudo rm -rf /home/$username
+   sudo cp -r /etc/skel /home/$username
+   sudo chown -R $username:$username /home/$username
   fi
+
+  ll /home/$username
 }
 
 main
