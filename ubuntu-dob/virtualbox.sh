@@ -22,8 +22,10 @@ fi
 mkdir -p /tmp/vbox
 mount -o loop "$LOCAL_FILE" /tmp/vbox
 
+requirements = "build-essential dkms bzip2 tar linux-headers-$(uname -r)"
+
 echo "installing deps necessary to compile kernel modules"
-apt-get install -y build-essential dkms bzip2 tar linux-headers-"$(uname -r)"
+apt-get install -y requirements
 
 echo "installing the vbox additions"
 # this install script fails with non-zero exit codes for no apparent reason so we need better ways to know if it worked
@@ -40,7 +42,8 @@ rm -rf /tmp/vbox
 rm -f "$LOCAL_FILE"
 
 echo "removing kernel dev packages and compilers we no longer need"
-apt-get remove -y build-essential gcc g++ make libc6-dev dkms linux-headers-"$(uname -r)"
+# apt-get remove -y build-essential gcc g++ make libc6-dev dkms linux-headers-"$(uname -r)"
+apt-get remove -y requirements
 
 echo "removing leftover logs"
 rm -rf /var/log/vboxadd*
