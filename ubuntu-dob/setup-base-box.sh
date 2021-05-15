@@ -12,6 +12,9 @@ main() {
   echo "===> Installing VirtualBox Guest Additions"
   sudo bash "${current_dir}/virtualbox.sh"
 
+  echo "Disable verbose messages on login..."
+  echo -n > "${HOME}/.hushlogin"
+
   echo "===> Removing setup dir"
 
   if [[ "$username" != "" ]]; then
