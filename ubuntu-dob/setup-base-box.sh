@@ -67,10 +67,12 @@ main() {
 
   echo "===> Removing setup dir"
 
+  sudo cleanup
+
   if [[ "$username" != "" ]]; then
     for dir in $HOME_DIR; do
       [ "$dir" = ".ssh" ] && continue
-      rm -rf "$dir"
+      sudo rm -rf "$dir"
     done
    sudo cp -r /etc/skel $HOME_DIR
    sudo chown -R $username:$username $HOME_DIR
@@ -78,7 +80,6 @@ main() {
 
   ls -ahl $HOME_DIR
 
-  sudo cleanup
 }
 
 main
