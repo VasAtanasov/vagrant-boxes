@@ -45,6 +45,11 @@ function main() {
   greenEcho "===> Installing VirtualBox Guest Additions"
   sudo bash "${current_dir}/virtualbox.sh"
 
+  greenEcho "===> Disabling cloud init"
+  # This delays boot by *a lot* for no apparent reason...
+  sudo touch /etc/cloud/cloud-init.disabled
+  sudo systemctl -q mask systemd-networkd-wait-online
+
   greenEcho "===> Cleaning up"
   sudo bash "${current_dir}/cleanup.sh"
 
@@ -53,6 +58,9 @@ function main() {
 
   greenEcho "===> Setting up firewall"
   setupUfw
+
+  redEcho "===> Removing setup dir"
+  rm -rf current_dir
 }
 
 main
