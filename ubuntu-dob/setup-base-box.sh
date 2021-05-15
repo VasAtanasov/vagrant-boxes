@@ -9,6 +9,11 @@ get_current_dir() {
 current_dir=$(get_current_dir)
 
 main() {
+  local username="vagrant"
+
+  echo "===> Adding vagrant public key to ~/.ssh/authorized_keys"
+  sudo bash "${current_dir}/vagrant.sh"
+
   echo "===> Installing VirtualBox Guest Additions"
   sudo bash "${current_dir}/virtualbox.sh"
 
@@ -18,15 +23,15 @@ main() {
   echo "===> Removing setup dir"
 
   if [[ "$username" != "" ]]; then
-   sudo rm -rf /home/$username
+    for dir in /home/$username; do
+      [ "$dir" = ".ssh" ] && continue
+      rm -rf "$dir"
+    done
    sudo cp -r /etc/skel /home/$username
    sudo chown -R $username:$username /home/$username
   fi
 
   ls -ahl /home/$username
-
-  echo "===> Adding vagrant public key to ~/.ssh/authorized_keys"
-  sudo bash "${current_dir}/vagrant.sh"
 }
 
 main
