@@ -12,6 +12,36 @@ disable_sudo_password() {
   sudo bash -c "echo '${username} ALL=(ALL) NOPASSWD: ALL' | (EDITOR='tee -a' visudo)"
 }
 
+cleanup() {
+  echo "autoremoving packages and cleaning apt data"
+  sudo apt-get -y autoremove
+  sudo apt-get -y clean
+
+  echo "remove /usr/share/doc/"
+  rm -rf /usr/share/doc/*
+
+  echo "remove /var/cache"
+  find /var/cache -type f -exec rm -rf {} \;
+
+  echo "truncate any logs that have built up during the install"
+  find /var/log -type f -exec truncate --size=0 {} \;
+
+  echo "blank netplan machine-id (DUID) so machines get unique ID generated on boot"
+  truncate -s 0 /etc/machine-id
+
+  echo "remove the contents of /tmp and /var/tmp"
+  rm -rf /tmp/* /var/tmp/*
+
+  echo "force a new random seed to be generated"
+  rm -f /var/lib/systemd/random-seed
+
+  sync
+
+  echo "clear the history so our install isn't there"
+  rm -f /root/.wget-hsts
+  export HISTSIZE=0
+}
+
 CURRENT_DIR=$(get_current_dir)
 HOME_DIR=/home/vagrant
 
