@@ -27,7 +27,7 @@ requirements="build-essential dkms bzip2 tar the gcc make perl g++ libc6-dev lin
 echo "requirements: $requirements"
 
 echo "installing deps necessary to compile kernel modules"
-sudo apt-get update -y >/dev null
+sudo apt-get update -y >/dev/null
 sudo apt-get install -y requirements
 
 echo "installing the vbox additions"
