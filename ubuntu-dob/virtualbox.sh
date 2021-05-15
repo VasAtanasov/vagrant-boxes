@@ -27,8 +27,8 @@ requirements="build-essential dkms bzip2 tar the gcc make perl g++ libc6-dev lin
 echo "requirements: $requirements"
 
 echo "installing deps necessary to compile kernel modules"
-sudo apt-get update -y >/dev/null
-sudo apt-get install -y requirements
+sudo apt-get update -qq >/dev/null
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq $requirements >/dev/null
 
 echo "installing the vbox additions"
 # this install script fails with non-zero exit codes for no apparent reason so we need better ways to know if it worked
@@ -46,7 +46,7 @@ rm -f "$LOCAL_FILE"
 
 echo "removing kernel dev packages and compilers we no longer need"
 # apt-get remove -y build-essential gcc g++ make libc6-dev dkms linux-headers-"$(uname -r)"
-sudo apt-get remove -y requirements
+sudo apt-get remove -y $requirements
 
 echo "removing leftover logs"
 rm -rf /var/log/vboxadd*
