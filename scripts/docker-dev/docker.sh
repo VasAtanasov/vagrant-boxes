@@ -17,8 +17,8 @@ fi
 
 if command_exists docker; then
   echo "Removing previouse versions of docker"
-  sudo apt-get remove docker docker-engine docker.io containerd runc
-  sudo apt-get purge docker-ce docker-ce-cli containerd.io
+  sudo apt-get remove -y docker docker-engine docker.io containerd runc
+  sudo apt-get purge -y docker-ce docker-ce-cli containerd.io
   sudo rm -rf /var/lib/docker
   sudo rm -rf /var/lib/containerd
 else
