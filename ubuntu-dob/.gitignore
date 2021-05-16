@@ -1,5 +1,4 @@
 *.tmp
 *.bak
 .vagrant
-.DS_Store
 .idea

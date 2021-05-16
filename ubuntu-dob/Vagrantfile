@@ -1,17 +1,77 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu-base"
+require 'yaml'
 
-  config.vm.define "ubuntu-box" do |box|
+VAGRANTFILE_API_VERSION = "2"
 
-    box.vm.provision "shell",  inline: "bash /vagrant/setup.sh", privileged: false
+ubuntu_release = "20.04"
+ubuntu_codenames = { "20.04" => "focal"} 
+
+vm_name = "Generic Ubuntu #{ubuntu_release} (#{ubuntu_codenames[ubuntu_release]})"
+vm_hostname = "vagrant-ubuntu-#{ubuntu_codenames[ubuntu_release]}"
+vm_size = {"cpu" => 1, "memory" => 1024}
+
+# Location of the external files used by this script...
+vagrant_assets = File.dirname(__FILE__) + "/assets"
+
+# Someone may need to (locally) override the VM size for some specific task...
+vm_size_override = File.dirname(__FILE__) + "/.vagrant_size.yml"
+if File.exists?(vm_size_override)
+    vm_size = YAML.load_file vm_size_override
+end
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vagrant.plugins = ["vagrant-vbguest"]
+
+  config.ssh.keep_alive = true
+  config.ssh.insert_key = false
   
-    box.vm.provider :virtualbox do |vb|
-      vb.name = "ubuntu-box-base"
-      vb.memory = 4096
-      vb.cpus = 2
-    end  
+  config.vm.box = "ubuntu/#{ubuntu_codenames[ubuntu_release]}64"
+  config.vm.hostname = vm_hostname  
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  # Perform base-system customizations and install project-specific dependencies...
+  config.vm.provision "shell", path: "#{vagrant_assets}/setup.sh", privileged: false  # ...run as the "vagrant" user.
+
+  config.vm.provision "shell", path: "#{vagrant_assets}/cleanup.sh"
+  
+  config.vm.provision "shell", path: "#{vagrant_assets}/minimize.sh"
+
+  config.vm.provider "virtualbox" do |vm, override|
+
+    vm.name = vm_name
+    vm.gui = false
+
+    vm.memory = vm_size["memory"]
+    vm.cpus = vm_size["cpu"]
+
+    # On Ubuntu boxes where guest additions are built in, we need to ensure that
+    # the vbguest plugin (required by other boxes) doesn't touch them in any way...
+    override.vbguest.auto_update = false
+    override.vbguest.allow_downgrade = false
+
+    # Enabling DNS proxy in NAT mode
+    # The NAT engine by default offers the same DNS servers to the guest that are configured on the host.
+    # In some scenarios, it can be desirable to hide the DNS server IPs from the guest, 
+    # for example when this information can change on the host due to expiring DHCP leases. 
+    # In this case, you can tell the NAT engine to act as DNS proxy using the following command:
+    vm.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+
+    # No need for audio in a server-type VM...
+    vm.customize ["modifyvm", :id, "--audio", "none"]
+    
+    # No need of usb support
+    vm.customize ["modifyvm", :id, "--usb", "off"]
+    vm.customize ["modifyvm", :id, "--usbehci", "off"]
+
+    # Override the console log location set by the base box...
+    console_log_file = File.join(vagrant_assets, "ubuntu-#{ubuntu_release}-console.log")
+    vm.customize ["modifyvm", :id, "--uart1", "0x3F8", "4"]
+    vm.customize ["modifyvm", :id, "--uartmode1", "file", console_log_file]
+
+    # Make the current directory visible (and editable) inside the VM...
+    override.vm.synced_folder ".", "/home/vagrant/shared"
   end
+
+ 
 end
