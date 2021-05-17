@@ -53,18 +53,29 @@ main() {
   green_echo "===> Upgrade all installed packages"
   sudo DEBIAN_FRONTEND=noninteractive apt-get -y dist-upgrade -o Dpkg::Options::="--force-confnew"
 
+  green_echo "===> Installing packages"
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -qq -y install \
+    pv tree vim curl zip unzip 
+
+  green_echo "===> Minimize the number of running daemons..."
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -qq -y purge snapd
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -qq -y autoremove
+
   green_echo "===> Disabling cloud init"
   # This delays boot by *a lot* for no apparent reason...
   sudo touch /etc/cloud/cloud-init.disabled
   sudo systemctl -q mask systemd-networkd-wait-online
+
+  green_echo "===> Disable verbose messages on login..."
+  echo -n > "${HOME}/.hushlogin"
 
   green_echo "===> Disabling unattended-upgrades"
   # We don't want the system to change behind our backs...
   sudo systemctl -q is-active unattended-upgrades && sudo systemctl stop unattended-upgrades
   sudo DEBIAN_FRONTEND=noninteractive apt-get -qq -y purge unattended-upgrades
 
-  green_echo "===> Setting up firewall"
-  setup_ufw
+  # green_echo "===> Setting up firewall"
+  # setup_ufw
 
   yellow_echo "===> setup.sh Done!"
 }

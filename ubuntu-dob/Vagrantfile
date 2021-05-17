@@ -70,7 +70,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vm.customize ["modifyvm", :id, "--uartmode1", "file", console_log_file]
 
     # Make the current directory visible (and editable) inside the VM...
-    override.vm.synced_folder ".", "/home/vagrant/shared"
+    # override.vm.synced_folder ".", "/home/vagrant/shared"
   end
 
  
