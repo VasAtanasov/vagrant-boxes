@@ -1,9 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-require 'yaml'
-settings = YAML.load_file 'settings.yml'
-
 VAGRANTFILE_API_VERSION = "2"
 
 ubuntu_release = "20.04"
@@ -26,12 +23,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ubuntu.vm.provision :shell do |shell|
       shell.path = "https://raw.githubusercontent.com/VasAtanasov/scripts/main/docker-dev/docker.sh"
     end
-
+    
     ubuntu.vm.provision :shell do |shell|
       shell.env = { 'CURRENT_USER' => 'vagrant'}
       shell.path = "https://raw.githubusercontent.com/VasAtanasov/scripts/main/docker-dev/docker-group.sh"
     end
-
+    
+    ubuntu.vm.provision :shell do |shell|
+      shell.path = "https://raw.githubusercontent.com/VasAtanasov/ubuntu-server-setup/main/assets/cleanup.sh"
+    end
+    
+    ubuntu.vm.provision :shell do |shell|
+      shell.path = "https://raw.githubusercontent.com/VasAtanasov/ubuntu-server-setup/main/assets/minimize.sh"
+    end
+    
     ubuntu.vm.provision "file", source: "#{vagrant_assets}/check_docker_container.sh", destination: "/home/vagrant/bin/check-docker-container"
     ubuntu.vm.provision "shell", inline: "chmod +x /home/vagrant/bin/*"
 
