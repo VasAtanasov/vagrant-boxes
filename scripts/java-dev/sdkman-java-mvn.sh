@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eux
+set -e
 
 JAVA_VERSION=${JAVA_VERSION:-"11.0.11.9.1-amzn"}
 MAVEN_VERSION=${MAVEN_VERSION:-"3.8.1"}
