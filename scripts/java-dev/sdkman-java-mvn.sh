@@ -1,9 +1,9 @@
 #!/bin/bash
 
-set -e
+set -eux
 
 JAVA_VERSION=${JAVA_VERSION:-"11.0.11.9.1-amzn"}
-MAVEN_VERSION=${MAVEN_VERSION:-"3.6.3"}
+MAVEN_VERSION=${MAVEN_VERSION:-"3.8.1"}
 
 echo "Java candidate: ${JAVA_VERSION}"
 echo "Maven candidate: ${MAVEN_VERSION}"
