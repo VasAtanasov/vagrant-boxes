@@ -13,12 +13,34 @@ vm_hostname = "vagrant-ubuntu-#{ubuntu_codenames[ubuntu_release]}"
 vm_size = {"cpu" => 1, "memory" => 1024}
 
 # Location of the external files used by this script...
-vagrant_assets = File.dirname(__FILE__) + "/assets"
+vagrant_assets = "./assets"
 
 # Someone may need to (locally) override the VM size for some specific task...
-vm_size_override = File.dirname(__FILE__) + "/.vagrant_size.yml"
+vm_size_override = "./.vagrant_size.yml"
 if File.exists?(vm_size_override)
     vm_size = YAML.load_file vm_size_override
+end
+
+def remove_host(config, codename)
+  $removehost = <<-SCRIPT
+  # PATH TO YOUR HOSTS FILE
+  ETC_HOSTS=/etc/hosts
+
+  # DEFAULT IP FOR HOSTNAME
+  IP="127.0.0.1"
+
+  # Hostname to add/remove.
+  HOSTNAME=ubuntu-#{codename}
+
+  if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
+  then
+      echo "$HOSTNAME Found in your $ETC_HOSTS, Removing now...";
+      sudo sed -i".bak" "/$HOSTNAME/d" $ETC_HOSTS
+  else
+      echo "$HOSTNAME was not found in your $ETC_HOSTS";
+  fi
+  SCRIPT
+  config.vm.provision "shell", inline: $removehost
 end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
@@ -28,10 +50,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.ssh.insert_key = false
   
   config.vm.box = "ubuntu/#{ubuntu_codenames[ubuntu_release]}64"
-  config.vm.hostname = vm_hostname  
+  # config.vm.hostname = vm_hostname  
+  
+  # removing previously defined hostname of ubuntu official images
+  remove_host(config, ubuntu_codenames[ubuntu_release])
+
   config.vm.synced_folder ".", "/vagrant", disabled: true
   # Perform base-system customizations and install project-specific dependencies...
-  config.vm.provision "shell", path: "#{vagrant_assets}/setup.sh", privileged: false  # ...run as the "vagrant" user.
+  config.vm.provision "shell", path: "#{vagrant_assets}/setup.sh"
 
   config.vm.provision "shell", path: "#{vagrant_assets}/cleanup.sh"
   
@@ -65,9 +91,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vm.customize ["modifyvm", :id, "--usbehci", "off"]
 
     # Override the console log location set by the base box...
-    console_log_file = File.join(vagrant_assets, "ubuntu-#{ubuntu_release}-console.log")
-    vm.customize ["modifyvm", :id, "--uart1", "0x3F8", "4"]
-    vm.customize ["modifyvm", :id, "--uartmode1", "file", console_log_file]
+    # console_log_file = File.join(vagrant_assets, "ubuntu-#{ubuntu_release}-console.log")
+    # vm.customize ["modifyvm", :id, "--uart1", "0x3F8", "4"]
+    # vm.customize ["modifyvm", :id, "--uartmode1", "file", console_log_file]
 
     # Make the current directory visible (and editable) inside the VM...
     # override.vm.synced_folder ".", "/home/vagrant/shared"
