@@ -1,8 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-include_vagrantfile = "../ubuntu-server-setup/Vagrantfile"
-p File.exist?("../ubuntu-server-setup/Vagrantfile")
+include_vagrantfile = "../Vagrantfile.ubuntu.base"
 load include_vagrantfile if File.exist?(include_vagrantfile)
 
 VAGRANTFILE_API_VERSION = "2"
@@ -14,30 +13,28 @@ vm_name = "Ubuntu Docker #{ubuntu_release} (#{ubuntu_codenames[ubuntu_release]})
 vm_hostname = "ubuntu-docker"
 
 # Location of the external files used by this script...
-vagrant_assets = "./assets"
+vagrant_assets = File.join(File.dirname(__FILE__), "/assets")
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.ssh.insert_key = false
 
-  # config.vm.box = "vasatanasov/ubuntu-dob"
-  # config.vm.hostname = vm_hostname
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
   config.vm.provision :shell do |shell|
-    shell.path = "https://raw.githubusercontent.com/VasAtanasov/scripts/main/docker-dev/docker.sh"
+    shell.path = File.expand_path("../scripts/docker-dev/docker.sh")
   end
   
   config.vm.provision :shell do |shell|
     shell.env = { 'CURRENT_USER' => 'vagrant'}
-    shell.path = "https://raw.githubusercontent.com/VasAtanasov/scripts/main/docker-dev/docker-group.sh"
+    shell.path = File.expand_path("../scripts/docker-dev/docker-group.sh")
   end
   
   config.vm.provision :shell do |shell|
-    shell.path = "https://raw.githubusercontent.com/VasAtanasov/ubuntu-server-setup/main/assets/cleanup.sh"
+    shell.path = File.expand_path("../scripts/cleanup/cleanup.sh")
   end
   
   config.vm.provision :shell do |shell|
-    shell.path = "https://raw.githubusercontent.com/VasAtanasov/ubuntu-server-setup/main/assets/minimize.sh"
+    shell.path = File.expand_path("../scripts/cleanup/minimize.sh")
   end
   
   config.vm.provision "file", source: "#{vagrant_assets}/check_docker_container.sh", destination: "/home/vagrant/bin/check-docker-container"  

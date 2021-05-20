@@ -2,5 +2,3 @@
 *.bak
 .vagrant
 .idea
-*.log
-*.box
