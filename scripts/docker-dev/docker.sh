@@ -48,13 +48,13 @@ echo \
 
 echo "Installing Docker Engine"
 
-DOCKER_COMPOSE_VERSION=${DOCKER_COMPOSE_VERSION:-1.29.1}
-
 update_packages
 
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io >/dev/null
 
 echo "Installing Docker Compose"
+
+DOCKER_COMPOSE_VERSION=${DOCKER_COMPOSE_VERSION:-1.29.1}
 
 sudo curl -sL "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
