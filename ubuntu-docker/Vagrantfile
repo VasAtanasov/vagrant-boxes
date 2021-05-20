@@ -1,0 +1,64 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+include_vagrantfile = "../ubuntu-server-setup/Vagrantfile"
+p File.exist?("../ubuntu-server-setup/Vagrantfile")
+load include_vagrantfile if File.exist?(include_vagrantfile)
+
+VAGRANTFILE_API_VERSION = "2"
+
+ubuntu_release = "20.04"
+ubuntu_codenames = { "20.04" => "focal"} 
+
+vm_name = "Ubuntu Docker #{ubuntu_release} (#{ubuntu_codenames[ubuntu_release]})"
+vm_hostname = "ubuntu-docker"
+
+# Location of the external files used by this script...
+vagrant_assets = "./assets"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.ssh.insert_key = false
+
+  # config.vm.box = "vasatanasov/ubuntu-dob"
+  # config.vm.hostname = vm_hostname
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  config.vm.provision :shell do |shell|
+    shell.path = "https://raw.githubusercontent.com/VasAtanasov/scripts/main/docker-dev/docker.sh"
+  end
+  
+  config.vm.provision :shell do |shell|
+    shell.env = { 'CURRENT_USER' => 'vagrant'}
+    shell.path = "https://raw.githubusercontent.com/VasAtanasov/scripts/main/docker-dev/docker-group.sh"
+  end
+  
+  config.vm.provision :shell do |shell|
+    shell.path = "https://raw.githubusercontent.com/VasAtanasov/ubuntu-server-setup/main/assets/cleanup.sh"
+  end
+  
+  config.vm.provision :shell do |shell|
+    shell.path = "https://raw.githubusercontent.com/VasAtanasov/ubuntu-server-setup/main/assets/minimize.sh"
+  end
+  
+  config.vm.provision "file", source: "#{vagrant_assets}/check_docker_container.sh", destination: "/home/vagrant/bin/check-docker-container"  
+  config.vm.provision "shell", inline: "chmod +x /home/vagrant/bin/*"  
+
+  config.vm.provision "shell", inline: "echo -n > /home/vagrant/.hushlogin"  
+
+  if File.file?("#{vagrant_assets}/logo") 
+    config.vm.provision "file", source: "#{vagrant_assets}/logo", destination: "/tmp/logo"
+    config.vm.provision "shell", inline: "cat /tmp/logo >> /etc/profile.d/greeting.sh"
+  end 
+
+  config.vm.provider :virtualbox do |vb, override|
+    vb.name = vm_name
+
+    # Override the console log location set by the base box...
+    # console_log_file = File.join(File.dirname(__FILE__), "console.log")
+    # vb.customize ["modifyvm", :id, "--uart1", "0x3F8", "4"]
+    # vb.customize ["modifyvm", :id, "--uartmode1", "file", console_log_file]
+
+    # override.vm.synced_folder "#{vagrant_assets}", "/home/vagrant/shared"
+  end 
+
+end
