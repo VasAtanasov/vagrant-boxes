@@ -1,0 +1,104 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+require 'yaml'
+
+VAGRANTFILE_API_VERSION = "2"
+
+ubuntu_release = "20.04"
+ubuntu_codenames = { "20.04" => "focal"} 
+
+vm_name = "Generic Ubuntu #{ubuntu_release} (#{ubuntu_codenames[ubuntu_release]})"
+vm_hostname = "vagrant-ubuntu-#{ubuntu_codenames[ubuntu_release]}"
+vm_size = {"cpu" => 1, "memory" => 1024}
+
+# Location of the external files used by this script...
+vagrant_assets = File.join(File.dirname(__FILE__), "/assets")
+
+# Someone may need to (locally) override the VM size for some specific task...
+vm_size_override = "./.vagrant_size.yml"
+if File.exists?(vm_size_override)
+    vm_size = YAML.load_file vm_size_override
+end
+
+def remove_host(config, codename)
+  $removehost = <<-SCRIPT
+  # PATH TO YOUR HOSTS FILE
+  ETC_HOSTS=/etc/hosts
+
+  # DEFAULT IP FOR HOSTNAME
+  IP="127.0.0.1"
+
+  # Hostname to add/remove.
+  HOSTNAME=ubuntu-#{codename}
+
+  if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
+  then
+      echo "$HOSTNAME Found in your $ETC_HOSTS, Removing now...";
+      sudo sed -i".bak" "/$HOSTNAME/d" $ETC_HOSTS
+  else
+      echo "$HOSTNAME was not found in your $ETC_HOSTS";
+  fi
+  SCRIPT
+  config.vm.provision "shell", inline: $removehost
+end
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vagrant.plugins = ["vagrant-vbguest"]
+
+  config.ssh.keep_alive = true
+  config.ssh.insert_key = false
+  
+  config.vm.box = "ubuntu/#{ubuntu_codenames[ubuntu_release]}64"
+
+  # config.vm.hostname = vm_hostname  
+  
+  # removing previously defined hostname of ubuntu official images
+  remove_host(config, ubuntu_codenames[ubuntu_release])
+
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  # Perform base-system customizations and install project-specific dependencies...
+  config.vm.provision "shell", path: "#{vagrant_assets}/setup.sh"
+
+  config.vm.provision "shell", path: "#{vagrant_assets}/cleanup.sh"
+  
+  config.vm.provision "shell", path: "#{vagrant_assets}/minimize.sh"
+
+  config.vm.provider "virtualbox" do |vm, override|
+
+    vm.name = vm_name
+    vm.gui = false
+
+    vm.memory = vm_size["memory"]
+    vm.cpus = vm_size["cpu"]
+
+    # On Ubuntu boxes where guest additions are built in, we need to ensure that
+    # the vbguest plugin (required by other boxes) doesn't touch them in any way...
+    override.vbguest.auto_update = false
+    override.vbguest.allow_downgrade = false
+
+    # Enabling DNS proxy in NAT mode
+    # The NAT engine by default offers the same DNS servers to the guest that are configured on the host.
+    # In some scenarios, it can be desirable to hide the DNS server IPs from the guest, 
+    # for example when this information can change on the host due to expiring DHCP leases. 
+    # In this case, you can tell the NAT engine to act as DNS proxy using the following command:
+    vm.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+
+    # No need for audio in a server-type VM...
+    vm.customize ["modifyvm", :id, "--audio", "none"]
+    
+    # No need of usb support
+    vm.customize ["modifyvm", :id, "--usb", "off"]
+    vm.customize ["modifyvm", :id, "--usbehci", "off"]
+
+    # Override the console log location set by the base box...
+    # console_log_file = File.join(vagrant_assets, "ubuntu-#{ubuntu_release}-console.log")
+    # vm.customize ["modifyvm", :id, "--uart1", "0x3F8", "4"]
+    # vm.customize ["modifyvm", :id, "--uartmode1", "file", console_log_file]
+
+    # Make the current directory visible (and editable) inside the VM...
+    # override.vm.synced_folder ".", "/home/vagrant/shared"
+  end
+
+ 
+end
