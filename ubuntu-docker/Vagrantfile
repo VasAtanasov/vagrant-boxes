@@ -1,6 +1,10 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+include_vagrantfile = "../ubuntu-server-setup/Vagrantfile"
+p File.exist?("../ubuntu-server-setup/Vagrantfile")
+load include_vagrantfile if File.exist?(include_vagrantfile)
+
 VAGRANTFILE_API_VERSION = "2"
 
 ubuntu_release = "20.04"
@@ -15,7 +19,7 @@ vagrant_assets = "./assets"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.ssh.insert_key = false
 
-  config.vm.box = "vasatanasov/ubuntu-dob"
+  # config.vm.box = "vasatanasov/ubuntu-dob"
   # config.vm.hostname = vm_hostname
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
