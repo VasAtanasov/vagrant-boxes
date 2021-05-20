@@ -13,7 +13,7 @@ vm_hostname = "vagrant-ubuntu-#{ubuntu_codenames[ubuntu_release]}"
 vm_size = {"cpu" => 1, "memory" => 1024}
 
 # Location of the external files used by this script...
-vagrant_assets = "./assets"
+vagrant_assets = File.join(File.dirname(__FILE__), "/assets")
 
 # Someone may need to (locally) override the VM size for some specific task...
 vm_size_override = "./.vagrant_size.yml"
@@ -50,6 +50,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.ssh.insert_key = false
   
   config.vm.box = "ubuntu/#{ubuntu_codenames[ubuntu_release]}64"
+
   # config.vm.hostname = vm_hostname  
   
   # removing previously defined hostname of ubuntu official images
