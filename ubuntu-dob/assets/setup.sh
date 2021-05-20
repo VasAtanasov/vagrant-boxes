@@ -60,9 +60,6 @@ main() {
   touch /etc/cloud/cloud-init.disabled
   systemctl -q mask systemd-networkd-wait-online
 
-  green_echo "===> Disable verbose messages on login..."
-  echo -n > "${HOME}/.hushlogin"
-
   green_echo "===> Disabling unattended-upgrades"
   # We don't want the system to change behind our backs...
   systemctl -q is-active unattended-upgrades && sudo systemctl stop unattended-upgrades
