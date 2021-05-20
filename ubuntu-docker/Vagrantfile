@@ -15,7 +15,7 @@ vagrant_assets = "./assets"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.ssh.insert_key = false
 
-  config.vm.box = "ubuntu-dob"
+  config.vm.box = "vasatanasov/ubuntu-dob"
   # config.vm.hostname = vm_hostname
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
@@ -38,6 +38,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   
   config.vm.provision "file", source: "#{vagrant_assets}/check_docker_container.sh", destination: "/home/vagrant/bin/check-docker-container"  
   config.vm.provision "shell", inline: "chmod +x /home/vagrant/bin/*"  
+
+  config.vm.provision "shell", inline: "echo -n > /home/vagrant/.hushlogin"  
 
   if File.file?("#{vagrant_assets}/logo") 
     config.vm.provision "file", source: "#{vagrant_assets}/logo", destination: "/tmp/logo"
