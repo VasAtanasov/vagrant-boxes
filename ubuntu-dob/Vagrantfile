@@ -7,6 +7,6 @@ load include_vagrantfile if File.exist?(include_vagrantfile)
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.provision "shell", path: File.expand_path("../scripts/cleanup/cleanup.sh") 
+  config.vm.provision "shell", path: File.expand_path("../scripts/cleanup/cleanup.sh")
   config.vm.provision "shell", path: File.expand_path("../scripts/cleanup/minimize.sh")
 end

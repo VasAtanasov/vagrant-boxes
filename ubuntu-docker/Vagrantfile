@@ -42,11 +42,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision "shell", inline: "echo -n > /home/vagrant/.hushlogin"  
 
-  if File.file?("#{vagrant_assets}/logo") 
-    config.vm.provision "file", source: "#{vagrant_assets}/logo", destination: "/tmp/logo"
-    config.vm.provision "shell", inline: "cat /tmp/logo >> /etc/profile.d/greeting.sh"
-  end 
-
   config.vm.provider :virtualbox do |vb, override|
     vb.name = vm_name
 
