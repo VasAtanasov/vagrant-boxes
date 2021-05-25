@@ -50,8 +50,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vagrant.plugins = ["vagrant-vbguest"]
 
   config.ssh.keep_alive = true
+  config.ssh.forward_agent = true
   config.ssh.insert_key = false
-  
+
   config.vm.box = "ubuntu/#{ubuntu_codenames[ubuntu_release]}64"
 
   # config.vm.hostname = vm_hostname  
