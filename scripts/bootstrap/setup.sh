@@ -48,8 +48,7 @@ main() {
   DEBIAN_FRONTEND=noninteractive apt-get -y dist-upgrade -o Dpkg::Options::="--force-confnew"
 
   green_echo "===> Installing packages"
-  DEBIAN_FRONTEND=noninteractive apt-get -qq -y install \
-    pv tree vim curl zip unzip 
+  DEBIAN_FRONTEND=noninteractive apt-get -qq -y install pv tree vim curl zip unzip 
 
   green_echo "===> Minimize the number of running daemons..."
   DEBIAN_FRONTEND=noninteractive apt-get -qq -y purge snapd
