@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -o errtrace
+set -o functrace
+set -o errexit
+set -o nounset
+set -o pipefail
+
+DEBIAN_FRONTEND=noninteractive apt-get update 
+DEBIAN_FRONTEND=noninteractive sudo apt-get install -y \
+    apt-utils net-tools lsof apt-transport-https \
+    curl tree jq gnupg2 ntp htop sshpass \
+    ufw dstat bash-completion unzip zip iperf perl \
+    software-properties-common netcat progress \
+    sysstat make build-essential rsync ca-certificates git \
+    lsb-release aria2 xfonts-utils tmate ncdu neofetch

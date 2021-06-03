@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -o errtrace
+set -o functrace
+set -o errexit
+set -o nounset
+set -o pipefail
+
+
+echo " ***************************************************************************** "
+echo " *** Starting installation of ansible "
+echo " ***************************************************************************** "
+DEBIAN_FRONTEND=noninteractive apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get -q -y install software-properties-common sshpass
+add-apt-repository --yes --update ppa:ansible/ansible
+DEBIAN_FRONTEND=noninteractive apt-get -q -y update
+DEBIAN_FRONTEND=noninteractive apt-get -q -y install ansible

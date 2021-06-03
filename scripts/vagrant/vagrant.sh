@@ -5,8 +5,8 @@ set -eux
 
 HOME_DIR="/home/vagrant";
 
-cp /etc/sudoers /etc/sudoers.bak
-bash -c "echo 'vagrant ALL=(ALL) NOPASSWD: ALL' | (EDITOR='tee -a' visudo)"
+sudo cp /etc/sudoers /etc/sudoers.bak
+sudo bash -c "echo 'vagrant ALL=(ALL) NOPASSWD: ALL' | (EDITOR='tee -a' visudo)"
 
 pubkey_url="https://raw.githubusercontent.com/hashicorp/vagrant/master/keys/vagrant.pub";
 mkdir -p "$HOME_DIR"/.ssh
@@ -26,4 +26,4 @@ chmod 0700 "$HOME_DIR"/.ssh
 
 
 # Mark the vagrant box build time.
-date --utc > /etc/vagrant_box_build_time
+date --utc | sudo tee /etc/vagrant_box_build_time
