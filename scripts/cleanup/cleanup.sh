@@ -4,7 +4,9 @@ DISK_USAGE_BEFORE_CLEANUP=$(df -h)
 
 echo "autoremoving packages and cleaning apt data"
 apt-get -y autoremove
+apt-get -y autoclean
 apt-get -y clean
+rm -rf /var/lib/apt/lists/*
 
 echo "remove /usr/share/doc/"
 rm -rf /usr/share/doc/*

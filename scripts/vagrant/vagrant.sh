@@ -1,9 +1,15 @@
-#!/bin/bash -eux
+#!/bin/bash 
 
-HOME_DIR="${HOME_DIR:-/home/vagrant}";
+# Enable exit/failure on error.
+set -eux
+
+HOME_DIR="/home/vagrant";
+
+cp /etc/sudoers /etc/sudoers.bak
+bash -c "echo 'vagrant ALL=(ALL) NOPASSWD: ALL' | (EDITOR='tee -a' visudo)"
 
 pubkey_url="https://raw.githubusercontent.com/hashicorp/vagrant/master/keys/vagrant.pub";
-mkdir -p "$HOME_DIR"/.ssh;
+mkdir -p "$HOME_DIR"/.ssh
 if command -v wget >/dev/null 2>&1; then
     wget --no-check-certificate "$pubkey_url" -O "$HOME_DIR"/.ssh/authorized_keys;
 elif command -v curl >/dev/null 2>&1; then
@@ -12,5 +18,12 @@ else
     echo "Cannot download vagrant public key";
     exit 1;
 fi
-chown -R vagrant "$HOME_DIR"/.ssh;
-chmod -R go-rwsx "$HOME_DIR"/.ssh;
+
+# Ensure the permissions are set correct to avoid OpenSSH complaints.
+chown -R vagrant:vagrant "$HOME_DIR"/.ssh
+chmod 0600 "$HOME_DIR"/.ssh/authorized_keys
+chmod 0700 "$HOME_DIR"/.ssh
+
+
+# Mark the vagrant box build time.
+date --utc > /etc/vagrant_box_build_time
