@@ -48,11 +48,15 @@ main() {
   DEBIAN_FRONTEND=noninteractive apt-get -y dist-upgrade -o Dpkg::Options::="--force-confnew"
 
   green_echo "===> Installing packages"
-  DEBIAN_FRONTEND=noninteractive apt-get -qq -y install pv tree vim curl zip unzip 
+  DEBIAN_FRONTEND=noninteractive apt-get -qq -y install pv tree vim \
+      curl zip unzip apt-utils wget ca-certificates gnupg2 git jq openssh-server
 
   green_echo "===> Minimize the number of running daemons..."
+  systemctl stop snapd && systemctl disable snapd
   DEBIAN_FRONTEND=noninteractive apt-get -qq -y purge snapd
   DEBIAN_FRONTEND=noninteractive apt-get -qq -y autoremove
+  rm -rf ~/snap
+  rm -rf /snap /var/snap /var/lib/snapd /var/cache/snapd /usr/lib/snapd
 
   green_echo "===> Disabling cloud init"
   # This delays boot by *a lot* for no apparent reason...
@@ -63,6 +67,12 @@ main() {
   # We don't want the system to change behind our backs...
   systemctl -q is-active unattended-upgrades && sudo systemctl stop unattended-upgrades
   DEBIAN_FRONTEND=noninteractive apt-get -qq -y purge unattended-upgrades
+
+  green_echo "===> Setting up openssh"
+  sed -i '/.*PasswordAuthentication.*/d' /etc/ssh/sshd_config
+  echo 'PasswordAuthentication yes' | tee -a /etc/ssh/sshd_config > /dev/null
+  service sshd restart
+  service sshd status
 
   # green_echo "===> Setting up firewall"
   # setup_ufw

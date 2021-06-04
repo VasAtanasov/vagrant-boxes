@@ -36,4 +36,5 @@ df -h
 
 echo "clear the history so our install isn't there"
 rm -f /root/.wget-hsts
+rm -f /home/vagrant/.wget-hsts
 export HISTSIZE=0

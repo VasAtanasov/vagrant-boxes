@@ -53,14 +53,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.ssh.forward_agent = true
   config.ssh.insert_key = false
 
-  # config.vm.box = "ubuntu/#{ubuntu_codenames[ubuntu_release]}64"
-  config.vm.box = "ubuntu-2004-server"
+  config.vm.box = "ubuntu/#{ubuntu_codenames[ubuntu_release]}64"
 
   # config.vm.hostname = vm_hostname  
   
   # removing previously defined hostname of ubuntu official images
-  # remove_host(config, ubuntu_codenames[ubuntu_release])
-  remove_host(config, "vagrant")
+  remove_host(config, ubuntu_codenames[ubuntu_release])
 
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
@@ -103,13 +101,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vm.customize ["modifyvm", :id, "--rtcuseutc",            "on"]
     vm.customize ["modifyvm", :id, "--pae",                  "on"]
     vm.customize ["modifyvm", :id, "--hwvirtex",             "on"]
-    # vm.customize ["modifyvm", :id, "--nestedpaging",         "on"]
+    vm.customize ["modifyvm", :id, "--nestedpaging",         "on"]
 
     vm.customize ["modifyvm", :id, "--uart1", "0x3F8",       "4"]
     vm.customize ["modifyvm", :id, "--uartmode1", "file",    File::NULL]
 
-    vm.customize ["modifyvm", :id, "--nestedpaging",         "off"]
-    vm.customize ["modifyvm", :id, "--paravirtprovider",     "hyperv"]
+    # vm.customize ["modifyvm", :id, "--nestedpaging",         "off"]
+    # vm.customize ["modifyvm", :id, "--paravirtprovider",     "hyperv"]
     
     # GFX settings
     vm.customize ["modifyvm", :id, "--graphicscontroller",   "vboxvga"]
