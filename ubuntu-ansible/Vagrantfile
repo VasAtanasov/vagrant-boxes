@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-include_vagrantfile = "../Vagrantfile.ubuntu.base"
+include_vagrantfile = "../base.ubuntu.Vagrantfile"
 load include_vagrantfile if File.exist?(include_vagrantfile)
 
 VAGRANTFILE_API_VERSION = "2"
